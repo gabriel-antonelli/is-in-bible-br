@@ -2,7 +2,11 @@ module github.com/gabriel-antonelli/is-in-the-bible-br
 
 go 1.21.1
 
-require github.com/blevesearch/bleve/v2 v2.3.10
+require (
+	github.com/blevesearch/bleve/v2 v2.3.10
+	github.com/gin-gonic/gin v1.9.1
+	golang.org/x/text v0.14.0
+)
 
 require (
 	github.com/RoaringBitmap/roaring v1.2.3 // indirect
@@ -27,7 +31,6 @@ require (
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/gin-gonic/gin v1.9.1 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.17.0 // indirect
@@ -50,7 +53,6 @@ require (
 	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/protobuf v1.32.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
