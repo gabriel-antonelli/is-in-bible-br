@@ -2,9 +2,9 @@ package main
 
 import (
 	"log"
+	"os"
+	"strings"
 
-	"github.com/blevesearch/bleve/v2"
-	"github.com/gabriel-antonelli/is-in-the-bible-br/internal"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,19 +28,11 @@ func searchWord() *gin.Engine {
 }
 
 func totalNumberIndexed(word string) int {
-	index, _ := bleve.Open("biblia.bleve")
-	defer index.Close()
-
-	word = internal.NormalizeText(word)
-
-	query := bleve.NewMatchQuery(word)
-	search := bleve.NewSearchRequest(query)
-	searchResults, _ := index.Search(search)
-
-	if len(searchResults.Hits) > 0 {
-		log.Printf("Found %d results for: %s", searchResults.Total, word)
-		return searchResults.Hits[0].Size()
+	file, err := os.ReadFile("biblia_normalized.txt")
+	if err != nil {
+		log.Fatal(err)
 	}
-	log.Printf("No results found for: %s", word)
-	return 0
+	stringFile := string(file)
+
+	return strings.Count(stringFile, word)
 }
