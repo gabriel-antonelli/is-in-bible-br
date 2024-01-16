@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"os"
-	"strings"
+	"regexp"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,6 +33,7 @@ func totalNumberIndexed(word string) int {
 		log.Fatal(err)
 	}
 	stringFile := string(file)
-
-	return strings.Count(stringFile, word)
+	regex := regexp.MustCompile(`(?i)\b` + word + `\b`)
+	matches := regex.FindAllString(stringFile, -1)
+	return len(matches)
 }
