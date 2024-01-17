@@ -1,45 +1,24 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"os"
-	"regexp"
-
+	"github.com/gabriel-antonelli/is-in-the-bible-br/internal/app/initial"
+	"github.com/gabriel-antonelli/is-in-the-bible-br/internal/app/routes"
 	"github.com/gin-gonic/gin"
 )
 
-var stringFile string
-var wordRegex *regexp.Regexp
+var path = "biblia_normalized.txt"
 
 func init() {
-	file, err := os.ReadFile("biblia_normalized.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-	stringFile = string(file)
+	initial.FileToString(path)
+}
+
+func setupRouter() *gin.Engine {
+	router := gin.Default()
+	routes.SearchRoutes(router)
+	return router
 }
 
 func main() {
-	r := searchWord()
-	r.Run()
-}
-
-func searchWord() *gin.Engine {
-	r := gin.Default()
-	r.GET("search/:word", func(c *gin.Context) {
-		word := c.Param("word")
-		wordRegex = regexp.MustCompile(fmt.Sprintf(`(?i)\b%s\b`, word))
-		total := totalNumberIndexed()
-		c.JSON(200, gin.H{
-			"found": total > 0,
-			"total": total,
-		})
-	})
-	return r
-}
-
-func totalNumberIndexed() int {
-	matches := wordRegex.FindAllString(stringFile, -1)
-	return len(matches)
+	router := setupRouter()
+	router.Run()
 }
