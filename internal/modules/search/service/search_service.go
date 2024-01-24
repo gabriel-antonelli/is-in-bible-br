@@ -9,7 +9,7 @@ import (
 )
 
 type SearchService interface {
-	Search(words string, stringFile string) map[string]int
+	Search(words string) map[string]int
 }
 
 type searchService struct {
@@ -21,7 +21,7 @@ func NewSearchService(wordNormalizer ports.WordNormalizer, wordSearcher ports.Wo
 	return &searchService{wordNormalizer, wordSearcher}
 }
 
-func (c *searchService) Search(words string, stringFile string) map[string]int {
+func (c *searchService) Search(words string) map[string]int {
 	results := make(map[string]int)
 	for _, word := range strings.Split(words, "+") {
 		if !validation.IsValidWord(word) {
@@ -35,7 +35,7 @@ func (c *searchService) Search(words string, stringFile string) map[string]int {
 		}
 
 		log.Printf("Searching for %s\n", word)
-		results[word] = c.wordSearcher.Total(word, stringFile)
+		results[word] = c.wordSearcher.Total(word)
 	}
 	return results
 }

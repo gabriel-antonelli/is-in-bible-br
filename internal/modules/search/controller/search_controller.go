@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"github.com/gabriel-antonelli/is-in-the-bible-br/internal/app/initial"
 	"github.com/gabriel-antonelli/is-in-the-bible-br/internal/modules/search/service"
 	"github.com/gabriel-antonelli/is-in-the-bible-br/internal/modules/shared"
 )
@@ -15,7 +14,7 @@ func NewSearchController(service service.SearchService) shared.Controller {
 }
 
 func (c *searchController) Handle(req shared.Request) shared.Response {
-	result := c.service.Search(req[0].(string), initial.StringFile)
+	result := c.service.Search(req[0].(string))
 	if len(result) == 0 {
 		return shared.Response{
 			StatusCode: 404,

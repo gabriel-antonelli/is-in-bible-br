@@ -12,7 +12,7 @@ import (
 func SearchRoutes(router *gin.Engine) {
 	router.GET("/search/:word", func(c *gin.Context) {
 		wordNormalizer := normalizer.NewWordNormalizerWithText()
-		wordSearcher := searcher.NewWordSearcherWithRegex()
+		wordSearcher := searcher.NewWordSearcherWithPebble()
 		service := service.NewSearchService(wordNormalizer, wordSearcher)
 		controller := controller.NewSearchController(service)
 		adapters.ControllerAdapter(controller, []string{"word"}, c)
