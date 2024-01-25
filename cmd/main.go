@@ -13,12 +13,28 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var path = "biblia_normalized.txt"
-
 func setupRouter() *gin.Engine {
 	router := gin.Default()
 	routes.SearchRoutes(router)
 	return router
+}
+
+func gracefulShutdown(srv *http.Server) {
+	log.Println("shutting down gracefully, press Ctrl+C again to force")
+
+	log.Println("Closing db")
+	err := config.GetDB().Close()
+	if err != nil {
+		log.Println("Error closing db: ", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server forced to shutdown: ", err)
+	}
+
+	log.Println("Server exiting")
 }
 
 func main() {
@@ -40,19 +56,5 @@ func main() {
 
 	<-ctx.Done()
 
-	stop()
-	log.Println("shutting down gracefully, press Ctrl+C again to force")
-
-	err := config.GetDB().Close()
-	if err != nil {
-		log.Println("Error closing db: ", err)
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatal("Server forced to shutdown: ", err)
-	}
-
-	log.Println("Server exiting")
+	gracefulShutdown(srv)
 }

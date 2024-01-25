@@ -6,15 +6,16 @@ import (
 	"github.com/cockroachdb/pebble"
 )
 
-var db *pebble.DB
+var pebbleDB *pebble.DB
 
 func GetDB() *pebble.DB {
-	if db != nil {
-		return db
+	if pebbleDB != nil {
+		return pebbleDB
 	}
 	db, err := pebble.Open("words-in-the-bible-db", &pebble.Options{})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("error opening db: %v", err)
 	}
+	pebbleDB = db
 	return db
 }
