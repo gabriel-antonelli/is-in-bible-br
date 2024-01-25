@@ -10,13 +10,28 @@ import (
 
 	"github.com/gabriel-antonelli/is-in-the-bible-br/internal/app/routes"
 	"github.com/gabriel-antonelli/is-in-the-bible-br/internal/config"
-	"github.com/gin-gonic/gin"
 )
 
-func setupRouter() *gin.Engine {
-	router := gin.Default()
-	routes.SearchRoutes(router)
-	return router
+func main() {
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+
+	router := routes.SetupRouter()
+
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: router,
+	}
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+
+	<-ctx.Done()
+
+	gracefulShutdown(srv)
 }
 
 func gracefulShutdown(srv *http.Server) {
@@ -35,26 +50,4 @@ func gracefulShutdown(srv *http.Server) {
 	}
 
 	log.Println("Server exiting")
-}
-
-func main() {
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
-	defer stop()
-
-	router := setupRouter()
-
-	srv := &http.Server{
-		Addr:    ":8080",
-		Handler: router,
-	}
-
-	go func() {
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen: %s\n", err)
-		}
-	}()
-
-	<-ctx.Done()
-
-	gracefulShutdown(srv)
 }
