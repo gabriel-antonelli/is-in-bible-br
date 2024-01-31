@@ -8,11 +8,16 @@ import (
 
 var pebbleDB *pebble.DB
 
-func GetDB() *pebble.DB {
+func GetDB(dbPath string) *pebble.DB {
 	if pebbleDB != nil {
+		log.Println("pebbleDB is not nil")
 		return pebbleDB
 	}
-	db, err := pebble.Open("words-in-the-bible-db", &pebble.Options{})
+	log.Println("pebbleDB is nil")
+	if dbPath == "" {
+		dbPath = "words-in-the-bible-db"
+	}
+	db, err := pebble.Open(dbPath, &pebble.Options{})
 	if err != nil {
 		log.Fatalf("error opening db: %v", err)
 	}

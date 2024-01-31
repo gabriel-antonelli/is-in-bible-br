@@ -14,7 +14,7 @@ func NewWordSearcherWithPebble() *WordSearcherWithPebble {
 }
 
 func (w *WordSearcherWithPebble) Total(word string) int {
-	db := config.GetDB()
+	db := config.GetDB("")
 	val, closer, err := db.Get([]byte(word))
 	if err != nil {
 		log.Printf("error getting key '%s': %v", word, err)
