@@ -8,15 +8,19 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gabriel-antonelli/is-in-the-bible-br/internal/app/middlewares"
 	"github.com/gabriel-antonelli/is-in-the-bible-br/internal/app/routes"
 	"github.com/gabriel-antonelli/is-in-the-bible-br/internal/config"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	router := routes.SetupRouter()
+	router := gin.Default()
+
+	router = routes.SetupRoutes(middlewares.AddCorsMiddleWare(router))
 
 	srv := &http.Server{
 		Addr:    ":8080",

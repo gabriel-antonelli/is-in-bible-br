@@ -4,9 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRouter() *gin.Engine {
-	router := gin.Default()
-
+func SetupRoutes(router *gin.Engine) *gin.Engine {
 	SearchRoutes(router)
 
 	return router
