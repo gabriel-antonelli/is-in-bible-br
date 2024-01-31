@@ -10,10 +10,8 @@ var pebbleDB *pebble.DB
 
 func GetDB(dbPath string) *pebble.DB {
 	if pebbleDB != nil {
-		log.Println("pebbleDB is not nil")
 		return pebbleDB
 	}
-	log.Println("pebbleDB is nil")
 	if dbPath == "" {
 		dbPath = "words-in-the-bible-db"
 	}
@@ -23,4 +21,14 @@ func GetDB(dbPath string) *pebble.DB {
 	}
 	pebbleDB = db
 	return db
+}
+
+func CloseDB() {
+	if pebbleDB != nil {
+		err := pebbleDB.Close()
+		if err != nil {
+			log.Fatalf("error closing db: %v", err)
+		}
+	}
+	pebbleDB = nil
 }

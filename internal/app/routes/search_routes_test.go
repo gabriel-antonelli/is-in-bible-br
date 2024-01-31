@@ -10,14 +10,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func setupTest() {
+	config.GetDB("../../../words-in-the-bible-db/")
+}
+
 func TestSearchWordRouteSuccess(t *testing.T) {
+	setupTest()
+
 	router := gin.Default()
 	router = SetupRoutes(middlewares.AddCorsMiddleWare(router))
 
 	request := httptest.NewRequest("GET", "/search/jesus+Amor+jeSUs+a+", nil)
 	response := httptest.NewRecorder()
-
-	config.GetDB("../../../words-in-the-bible-db/")
 
 	router.ServeHTTP(response, request)
 
@@ -32,8 +36,6 @@ func TestSearchWordRouteNotFound(t *testing.T) {
 	request := httptest.NewRequest("GET", "/search/a+", nil)
 	response := httptest.NewRecorder()
 
-	config.GetDB("../../../words-in-the-bible-db/")
-
 	router.ServeHTTP(response, request)
 
 	assert.Equal(t, 404, response.Code, "OK response is expected")
@@ -41,13 +43,12 @@ func TestSearchWordRouteNotFound(t *testing.T) {
 }
 
 func TestSearchWordRouteKeyNotFoundReturn0(t *testing.T) {
+	defer config.CloseDB()
 	router := gin.Default()
 	router = SetupRoutes(middlewares.AddCorsMiddleWare(router))
 
 	request := httptest.NewRequest("GET", "/search/aaaa", nil)
 	response := httptest.NewRecorder()
-
-	config.GetDB("../../../words-in-the-bible-db/")
 
 	router.ServeHTTP(response, request)
 

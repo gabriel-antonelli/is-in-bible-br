@@ -14,13 +14,22 @@ func NewSearchController(service service.SearchService) shared.Controller {
 }
 
 func (c *searchController) Handle(req shared.Request) shared.Response {
+	if len(req) == 0 {
+		return shared.Response{
+			StatusCode: 400,
+			Result:     "No words to search for",
+		}
+	}
+
 	result := c.service.Search(req[0].(string))
+
 	if len(result) == 0 {
 		return shared.Response{
 			StatusCode: 404,
 			Result:     "Not Found",
 		}
 	}
+
 	return shared.Response{
 		StatusCode: 200,
 		Result:     result,
