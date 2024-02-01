@@ -24,10 +24,12 @@ jobs:
       - name: Run unit Tests
         run: |
           go test -coverprofile=./cov.out ./...
+
       - name: Run Gosec Security Scanner
-        run: |
-          go get github.com/securego/gosec/cmd/gosec
-          gosec -no-fail -fmt=sonarqube -out report.json ./...
+        uses: securego/gosec@master
+        with:
+          args: ./...
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
