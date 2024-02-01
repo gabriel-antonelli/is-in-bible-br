@@ -24,13 +24,18 @@ func main() {
 
 	router = routes.SetupRoutes(middlewares.AddCorsMiddleWare(router))
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	srv := &http.Server{
 		ReadTimeout:       1 * time.Second,
 		WriteTimeout:      1 * time.Second,
 		IdleTimeout:       30 * time.Second,
 		ReadHeaderTimeout: 2 * time.Second,
 		Handler:           router,
-		Addr:              fmt.Sprintf(":%s", os.Getenv("PORT")),
+		Addr:              fmt.Sprintf(":%s", port),
 	}
 
 	go func() {
