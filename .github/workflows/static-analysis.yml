@@ -28,7 +28,7 @@ jobs:
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
         with:
-          args: ./...
+          args: -no-fail -fmt=sonarqube -out report.json ./...
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
