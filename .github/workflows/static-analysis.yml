@@ -23,7 +23,7 @@ jobs:
 
       - name: Run unit Tests
         run: |
-          go test -coverprofile=./cov.out ./...
+          go test -coverpkg=./... -coverprofile=./cov.out ./...
 
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
