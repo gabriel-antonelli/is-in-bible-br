@@ -23,8 +23,12 @@ func main() {
 	router = routes.SetupRoutes(middlewares.AddCorsMiddleWare(router))
 
 	srv := &http.Server{
-		Addr:    ":8080",
-		Handler: router,
+		ReadTimeout:       1 * time.Second,
+		WriteTimeout:      1 * time.Second,
+		IdleTimeout:       30 * time.Second,
+		ReadHeaderTimeout: 2 * time.Second,
+		Handler:           router,
+		Addr:              ":8080",
 	}
 
 	go func() {
