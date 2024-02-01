@@ -2,6 +2,7 @@ package routes
 
 import (
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/gabriel-antonelli/is-in-the-bible-br/internal/app/middlewares"
@@ -10,15 +11,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func setupTest() {
-	config.GetDB("../../../words-in-the-bible-db/")
+func setupTest(t *testing.T) {
+	config.GetDB("")
+	t.Cleanup(func() {
+		config.CloseDB()
+		err := os.RemoveAll("words-in-the-bible-db")
+		if err != nil {
+			t.Fatalf("error removing temp dir: %v", err)
+		}
+	})
 }
 
 func TestSearchWordRouteSuccess(t *testing.T) {
-	setupTest()
+	setupTest(t)
 
 	router := gin.Default()
 	router = SetupRoutes(middlewares.AddCorsMiddleWare(router))
+	config.GetDB("").Set([]byte("jesus"), []byte("1075"), nil)
+	config.GetDB("").Set([]byte("amor"), []byte("266"), nil)
 
 	request := httptest.NewRequest("GET", "/search/jesus+Amor+jeSUs+a+", nil)
 	response := httptest.NewRecorder()
@@ -30,6 +40,7 @@ func TestSearchWordRouteSuccess(t *testing.T) {
 }
 
 func TestSearchWordRouteNotFound(t *testing.T) {
+	setupTest(t)
 	router := gin.Default()
 	router = SetupRoutes(middlewares.AddCorsMiddleWare(router))
 
@@ -43,6 +54,7 @@ func TestSearchWordRouteNotFound(t *testing.T) {
 }
 
 func TestSearchWordRouteKeyNotFoundReturn0(t *testing.T) {
+	setupTest(t)
 	defer config.CloseDB()
 	router := gin.Default()
 	router = SetupRoutes(middlewares.AddCorsMiddleWare(router))
