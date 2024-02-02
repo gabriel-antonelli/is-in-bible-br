@@ -22,8 +22,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       
-      - name: Build Docker image
-        run: docker build -t is-in-bible-br .
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and export Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          tags: is-in-bible-br:latest
+          outputs: type=docker,dest=/tmp/is-in-bible-br.tar
+
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: is-in-bible-br
+          path: /tmp/is-in-bible-br.tar
 
   deploy:
     name: Deploy app
@@ -37,7 +50,17 @@ jobs:
       - name: Set up Flyctl
         uses: superfly/flyctl-actions/setup-flyctl@master
 
+      - name: Download Docker image artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: is-in-bible-br
+          path: /tmp
+
+      - name: Load Docker image
+        run: |
+          docker load --input /tmp/is-in-bible-br.tar
+
       - name: Deploy with Flyctl
-        run: flyctl deploy --image is-in-bible-br --local-only --buildpacks-docker-host local --debug
+        run: flyctl deploy --image is-in-bible-br --debug
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
