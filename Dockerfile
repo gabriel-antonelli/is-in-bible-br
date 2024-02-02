@@ -1,6 +1,11 @@
 # syntax=docker/dockerfile:1
 FROM golang:latest
 
+RUN addgroup --system nonroot \
+  && adduser --system nonroot --ingroup nonroot
+
+USER nonroot
+
 WORKDIR /app
 
 COPY go.mod go.sum ./
