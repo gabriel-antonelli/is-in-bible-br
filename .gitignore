@@ -21,6 +21,3 @@
 go.work
 
 words-in-the-bible-db/*.log
-words-in-the-bible-db/MANIFEST-*
-words-in-the-bible-db/OPTIONS-*
-words-in-the-bible-db/CURRENT
