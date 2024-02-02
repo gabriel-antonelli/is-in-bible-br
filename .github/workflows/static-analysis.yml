@@ -50,7 +50,8 @@ jobs:
       - name: Run Gosec Security Scanner
         id: gosec
         uses: securego/gosec@master
-        run: securego/gosec -no-fail -fmt=sonarqube -out report.json ./...
+        with:  
+          args: -no-fail -fmt=sonarqube -out report.json ./...
 
       - name: Save Gosec report as artifact
         uses: actions/upload-artifact@v3
