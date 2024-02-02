@@ -1,13 +1,23 @@
 name: Fly Deploy
 on:
-  push:
-    branches:
-      - main    # change to main if needed
+  workflow_run:
+    workflows:
+      - "static-analysis"
+    types:
+      - completed
 
 jobs:
+  verify-triggering-workflow:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Verify the triggering workflow passed
+        run: echo 'The triggering workflow passed'
+
   build:
     name: Build Docker image
     runs-on: ubuntu-latest
+    needs: verify-triggering-workflow
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -28,6 +38,6 @@ jobs:
         uses: superfly/flyctl-actions/setup-flyctl@master
 
       - name: Deploy with Flyctl
-        run: flyctl deploy --remote-only --image is-in-bible-br
+        run: flyctl launch --image is-in-bible-br --local-only --buildpacks-docker-host local --debug
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
