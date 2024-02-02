@@ -49,6 +49,7 @@ jobs:
 
       - name: Run Gosec Security Scanner
         id: gosec
+        uses: securego/gosec@master
         run: securego/gosec -no-fail -fmt=sonarqube -out report.json ./...
 
       - name: Save Gosec report as artifact
@@ -80,6 +81,7 @@ jobs:
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         with:
+          args: -no-fail -fmt=sonarqube -out report.json ./...
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           coverageReportPath: ./cov.out
