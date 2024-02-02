@@ -85,6 +85,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
-          args: -no-fail -fmt=sonarqube -out report.json ./...
           coverageReportPath: ./cov.out
           gosecReportPath: ./report.json
