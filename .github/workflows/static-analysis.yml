@@ -5,33 +5,82 @@ on:
       - main
   pull_request:
     types: [ opened, synchronize, reopened ]
-  workflow_dispatch: { }
+  workflow_dispatch: {}
 
 jobs:
-  analyze:
-    name: Static analysis
+  unit-tests:
+    name: Unit Tests
     runs-on: ubuntu-latest
+    outputs:
+      coverage-report: ${{ steps.coverage.outputs.coverage-report }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Setup Go
         uses: actions/setup-go@v5.0.0
         with:
           go-version: "stable"
 
-      - name: Run unit Tests
+      - name: Run Unit Tests
+        id: coverage
         run: |
           go test -coverpkg=./... -coverprofile=./cov.out ./...
 
-      - name: Run Gosec Security Scanner
-        uses: securego/gosec@master
+      - name: Save coverage report as artifact
+        uses: actions/upload-artifact@v3
         with:
-          args: -no-fail -fmt=sonarqube -out report.json ./...
+          name: unit-test-artifacts
+          path: ./cov.out
+
+  gosec-analysis:
+    name: Gosec Security Scanner
+    runs-on: ubuntu-latest
+    outputs:
+      gosec-report: ${{ steps.gosec.outputs.gosec-report }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5.0.0
+        with:
+          go-version: "stable"
+
+      - name: Run Gosec Security Scanner
+        id: gosec
+        run: securego/gosec -no-fail -fmt=sonarqube -out report.json ./...
+
+      - name: Save Gosec report as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: gosec-artifacts
+          path: ./report.json
+
+  sonarcloud-scan:
+    name: SonarCloud Scan
+    runs-on: ubuntu-latest
+    needs: [unit-tests, gosec-analysis]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download unit test artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: unit-test-artifacts
+          path: ./
+
+      - name: Download Gosec artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: gosec-artifacts
+          path: ./
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
-        env:
+        with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          coverageReportPath: ./cov.out
+          gosecReportPath: ./report.json
