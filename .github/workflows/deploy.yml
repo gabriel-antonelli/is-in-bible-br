@@ -1,0 +1,33 @@
+name: Fly Deploy
+on:
+  push:
+    branches:
+      - main    # change to main if needed
+
+jobs:
+  build:
+    name: Build Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Build Docker image
+        run: docker build -t is-in-bible-br .
+
+  deploy:
+    name: Deploy app
+    runs-on: ubuntu-latest
+    concurrency: deploy-group    # optional: ensure only one action runs at a time
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy with Flyctl
+        run: flyctl deploy --remote-only --image is-in-bible-br
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
