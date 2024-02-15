@@ -8,7 +8,7 @@ import (
 )
 
 func AddCorsMiddleWare(router *gin.Engine) *gin.Engine {
-	originNonRelease, originRelease := "http://localhost:3000", "https://is-in-bible-br-frontend.vercel.app"
+	originNonRelease, originRelease := "http://localhost:3000", "https://is-in-bible-br.vercel.app"
 	router.Use(cors.New(cors.Config{
 		AllowOriginFunc: func(origin string) bool {
 			if origin == originNonRelease && gin.Mode() != "release" {
